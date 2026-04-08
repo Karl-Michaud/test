@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/shared/components/DataTable";
+import { SeveritySelect } from "@/shared/components/SeveritySelect";
 import { Bug, BugSeverity, BugStatus } from "@/features/backlog/models/types";
 
 const SEVERITY_STYLES: Record<BugSeverity, string> = {
@@ -45,10 +46,11 @@ function formatDate(iso: string) {
 
 interface BacklogTableProps {
   bugs: Bug[];
+  onUpdateSeverity?: (bugId: string, severity: BugSeverity) => void;
   actionSlot?: (bug: Bug) => React.ReactNode;
 }
 
-export function BacklogTable({ bugs, actionSlot }: BacklogTableProps) {
+export function BacklogTable({ bugs, onUpdateSeverity, actionSlot }: BacklogTableProps) {
   const columns: ColumnDef<Bug, unknown>[] = [
     {
       accessorKey: "title",
@@ -64,12 +66,19 @@ export function BacklogTable({ bugs, actionSlot }: BacklogTableProps) {
       accessorKey: "severity",
       header: "Severity",
       enableSorting: true,
-      cell: ({ row }) => (
-        <Badge
-          text={row.original.severity}
-          className={SEVERITY_STYLES[row.original.severity]}
-        />
-      ),
+      cell: ({ row }) =>
+        onUpdateSeverity ? (
+          <SeveritySelect
+            bugId={row.original.id}
+            current={row.original.severity}
+            onUpdate={onUpdateSeverity}
+          />
+        ) : (
+          <Badge
+            text={row.original.severity}
+            className={SEVERITY_STYLES[row.original.severity]}
+          />
+        ),
     },
     {
       accessorKey: "status",

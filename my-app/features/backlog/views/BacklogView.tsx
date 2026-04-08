@@ -3,41 +3,47 @@
 import { useBacklogViewModel } from "@/features/backlog/viewmodels/useBacklogViewModel";
 import { BacklogTable } from "@/features/backlog/views/components/BacklogTable";
 import { useEngineer } from "@/shared/context/EngineerContext";
-import { Bug } from "@/features/backlog/models/types";
+import { Bug, BugSeverity } from "@/features/backlog/models/types";
 
 export function BacklogView() {
-  const { bugs, loading, error, claimBug, unclaimBug } = useBacklogViewModel();
+  const { bugs, loading, error, claimBug, unclaimBug, updateSeverity, dismissBug } = useBacklogViewModel();
   const { engineer } = useEngineer();
 
   function renderActions(bug: Bug) {
     const isOwnedByMe = engineer && bug.assigned_engineer_id === engineer.id;
     const isUnassigned = !bug.assigned_engineer_id;
 
-    if (!engineer) return null;
+    const claimAction = engineer && isUnassigned ? (
+      <button
+        onClick={() => claimBug(bug.id, engineer)}
+        className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+      >
+        Claim
+      </button>
+    ) : engineer && isOwnedByMe ? (
+      <button
+        onClick={() => unclaimBug(bug.id)}
+        className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+      >
+        Unclaim
+      </button>
+    ) : null;
 
-    if (isOwnedByMe) {
-      return (
-        <button
-          onClick={() => unclaimBug(bug.id)}
-          className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-        >
-          Unclaim
-        </button>
-      );
-    }
+    const dismissAction = (
+      <button
+        onClick={() => dismissBug(bug.id)}
+        className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
+      >
+        Dismiss
+      </button>
+    );
 
-    if (isUnassigned) {
-      return (
-        <button
-          onClick={() => claimBug(bug.id, engineer)}
-          className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-        >
-          Claim
-        </button>
-      );
-    }
-
-    return null;
+    return (
+      <div className="flex items-center gap-3">
+        {claimAction}
+        {dismissAction}
+      </div>
+    );
   }
 
   return (
@@ -70,7 +76,11 @@ export function BacklogView() {
           Loading bugs…
         </div>
       ) : (
-        <BacklogTable bugs={bugs} actionSlot={renderActions} />
+        <BacklogTable
+          bugs={bugs}
+          onUpdateSeverity={(bugId: string, severity: BugSeverity) => updateSeverity(bugId, severity)}
+          actionSlot={renderActions}
+        />
       )}
     </div>
   );

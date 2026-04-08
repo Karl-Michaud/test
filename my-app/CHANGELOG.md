@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- Part 4: Triage
+  - `shared/components/SeveritySelect.tsx` — inline severity dropdown styled after reference StageSelect
+  - `useBacklogViewModel` extended with `updateSeverity` (sets severity + marks bug as `triaged`) and `dismissBug` (sets `dismissed`, records `resolved_at`)
+  - `BacklogTable` severity column replaced with `SeveritySelect` when `onUpdateSeverity` prop is provided
+  - `BacklogView` wires up severity changes and Dismiss button in the actions column
 - Part 3: Ownership & My Bugs
   - `useBacklogViewModel` extended with `claimBug` and `unclaimBug` (optimistic updates)
   - `BacklogView` now renders Claim/Unclaim buttons per row based on current engineer

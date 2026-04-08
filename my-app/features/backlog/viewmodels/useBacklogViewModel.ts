@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createClient } from "@/shared/supabase/client";
-import { Bug } from "@/features/backlog/models/types";
+import { Bug, BugSeverity } from "@/features/backlog/models/types";
 import { Engineer } from "@/shared/context/EngineerContext";
 
 interface UseBacklogViewModel {
@@ -12,6 +12,8 @@ interface UseBacklogViewModel {
   refresh: () => void;
   claimBug: (bugId: string, engineer: Engineer) => Promise<void>;
   unclaimBug: (bugId: string) => Promise<void>;
+  updateSeverity: (bugId: string, severity: BugSeverity) => Promise<void>;
+  dismissBug: (bugId: string) => Promise<void>;
 }
 
 export function useBacklogViewModel(): UseBacklogViewModel {
@@ -100,5 +102,41 @@ export function useBacklogViewModel(): UseBacklogViewModel {
     }
   }, [fetchBugs]);
 
-  return { bugs, loading, error, refresh: fetchBugs, claimBug, unclaimBug };
+  const updateSeverity = useCallback(async (bugId: string, severity: BugSeverity) => {
+    const updated = bugsRef.current.map((b) =>
+      b.id === bugId ? { ...b, severity } : b
+    );
+    bugsRef.current = updated;
+    setBugs(updated);
+
+    const client = createClient();
+    const { error: updateError } = await client
+      .from("bugs")
+      .update({ severity, status: "triaged" })
+      .eq("id", bugId);
+
+    if (updateError) {
+      setError(updateError.message);
+      fetchBugs();
+    }
+  }, [fetchBugs]);
+
+  const dismissBug = useCallback(async (bugId: string) => {
+    const updated = bugsRef.current.filter((b) => b.id !== bugId);
+    bugsRef.current = updated;
+    setBugs(updated);
+
+    const client = createClient();
+    const { error: updateError } = await client
+      .from("bugs")
+      .update({ status: "dismissed", resolved_at: new Date().toISOString() })
+      .eq("id", bugId);
+
+    if (updateError) {
+      setError(updateError.message);
+      fetchBugs();
+    }
+  }, [fetchBugs]);
+
+  return { bugs, loading, error, refresh: fetchBugs, claimBug, unclaimBug, updateSeverity, dismissBug };
 }
