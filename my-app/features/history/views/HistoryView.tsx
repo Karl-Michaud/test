@@ -16,7 +16,7 @@ export function HistoryView() {
           History
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {loading ? "\u00a0" : `${bugs.length} resolved or dismissed bug${bugs.length !== 1 ? "s" : ""}`}
+          {loading ? "\u00a0" : `${bugs.length} resolved bug${bugs.length !== 1 ? "s" : ""}`}
         </p>
       </div>
 
