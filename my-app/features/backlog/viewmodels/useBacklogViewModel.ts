@@ -13,6 +13,7 @@ interface UseBacklogViewModel {
   claimBug: (bugId: string, engineer: Engineer) => Promise<void>;
   unclaimBug: (bugId: string) => Promise<void>;
   updateSeverity: (bugId: string, severity: BugSeverity) => Promise<void>;
+  triageBug: (bugId: string) => Promise<void>;
   dismissBug: (bugId: string) => Promise<void>;
 }
 
@@ -104,7 +105,7 @@ export function useBacklogViewModel(): UseBacklogViewModel {
 
   const updateSeverity = useCallback(async (bugId: string, severity: BugSeverity) => {
     const updated = bugsRef.current.map((b) =>
-      b.id === bugId ? { ...b, severity } : b
+      b.id === bugId ? { ...b, severity, status: "triaged" as const } : b
     );
     bugsRef.current = updated;
     setBugs(updated);
@@ -113,6 +114,25 @@ export function useBacklogViewModel(): UseBacklogViewModel {
     const { error: updateError } = await client
       .from("bugs")
       .update({ severity, status: "triaged" })
+      .eq("id", bugId);
+
+    if (updateError) {
+      setError(updateError.message);
+      fetchBugs();
+    }
+  }, [fetchBugs]);
+
+  const triageBug = useCallback(async (bugId: string) => {
+    const updated = bugsRef.current.map((b) =>
+      b.id === bugId ? { ...b, status: "triaged" as const } : b
+    );
+    bugsRef.current = updated;
+    setBugs(updated);
+
+    const client = createClient();
+    const { error: updateError } = await client
+      .from("bugs")
+      .update({ status: "triaged" })
       .eq("id", bugId);
 
     if (updateError) {
@@ -138,5 +158,5 @@ export function useBacklogViewModel(): UseBacklogViewModel {
     }
   }, [fetchBugs]);
 
-  return { bugs, loading, error, refresh: fetchBugs, claimBug, unclaimBug, updateSeverity, dismissBug };
+  return { bugs, loading, error, refresh: fetchBugs, claimBug, unclaimBug, updateSeverity, triageBug, dismissBug };
 }

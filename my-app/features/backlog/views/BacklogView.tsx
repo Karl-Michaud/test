@@ -10,7 +10,7 @@ import { ReportBugModal } from "@/features/bugs/views/components/ReportBugModal"
 
 export function BacklogView() {
   const router = useRouter();
-  const { bugs, loading, error, refresh, claimBug, unclaimBug, updateSeverity, dismissBug } = useBacklogViewModel();
+  const { bugs, loading, error, refresh, claimBug, unclaimBug, updateSeverity, triageBug, dismissBug } = useBacklogViewModel();
   const { engineer } = useEngineer();
   const [reportingOpen, setReportingOpen] = useState(false);
 
@@ -18,35 +18,34 @@ export function BacklogView() {
     const isOwnedByMe = engineer && bug.assigned_engineer_id === engineer.id;
     const isUnassigned = !bug.assigned_engineer_id;
 
-    const claimAction = engineer && isUnassigned ? (
-      <button
-        onClick={() => claimBug(bug.id, engineer)}
-        className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-      >
-        Claim
-      </button>
-    ) : engineer && isOwnedByMe ? (
-      <button
-        onClick={() => unclaimBug(bug.id)}
-        className="text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-      >
-        Unclaim
-      </button>
-    ) : null;
+    const options = [
+      ...(bug.status === "open" ? [{ value: "triage", label: "Triage" }] : []),
+      ...(engineer && isUnassigned ? [{ value: "claim", label: "Claim" }] : []),
+      ...(engineer && isOwnedByMe ? [{ value: "unclaim", label: "Unclaim" }] : []),
+      { value: "dismiss", label: "Dismiss" },
+    ];
 
-    const dismissAction = (
-      <button
-        onClick={() => dismissBug(bug.id)}
-        className="text-xs text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
-      >
-        Dismiss
-      </button>
-    );
+    function handleAction(e: React.ChangeEvent<HTMLSelectElement>) {
+      const action = e.target.value;
+      e.target.value = "";
+      if (action === "triage") triageBug(bug.id);
+      else if (action === "claim" && engineer) claimBug(bug.id, engineer);
+      else if (action === "unclaim") unclaimBug(bug.id);
+      else if (action === "dismiss") dismissBug(bug.id);
+    }
 
     return (
-      <div className="flex items-center gap-3">
-        {claimAction}
-        {dismissAction}
+      <div onClick={(e) => e.stopPropagation()}>
+        <select
+          defaultValue=""
+          onChange={handleAction}
+          className="text-sm rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-2 py-1 pr-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-zinc-400 text-zinc-700 dark:text-zinc-300"
+        >
+          <option value="" disabled>Actions</option>
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </div>
     );
   }

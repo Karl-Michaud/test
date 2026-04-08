@@ -69,11 +69,13 @@ export function BacklogTable({ bugs, onUpdateSeverity, actionSlot, onRowClick }:
       enableSorting: true,
       cell: ({ row }) =>
         onUpdateSeverity ? (
-          <SeveritySelect
-            bugId={row.original.id}
-            current={row.original.severity}
-            onUpdate={onUpdateSeverity}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <SeveritySelect
+              bugId={row.original.id}
+              current={row.original.severity}
+              onUpdate={onUpdateSeverity}
+            />
+          </div>
         ) : (
           <Badge
             text={row.original.severity}
