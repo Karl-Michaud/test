@@ -3,6 +3,13 @@
 ## [Unreleased]
 
 ### Added
+- Part 3: Ownership & My Bugs
+  - `useBacklogViewModel` extended with `claimBug` and `unclaimBug` (optimistic updates)
+  - `BacklogView` now renders Claim/Unclaim buttons per row based on current engineer
+  - `features/my-bugs/viewmodels/useMyBugsViewModel.ts` — fetches bugs assigned to current engineer, `markResolved` action
+  - `features/my-bugs/views/components/MyBugsTable.tsx` — table with Mark Resolved action per row
+  - `features/my-bugs/views/MyBugsView.tsx` — view with no-engineer guard state
+  - `app/my-bugs/page.tsx` — route at `/my-bugs`
 - Part 2: Backlog page
   - `features/backlog/models/types.ts` — `Bug`, `BugSeverity`, `BugStatus` types
   - `features/backlog/viewmodels/useBacklogViewModel.ts` — fetches active bugs from Supabase
