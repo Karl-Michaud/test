@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 ### Added
+- Engineer creation from selector
+  - `EngineerContext` exposes `createEngineer(name)` — inserts into Supabase and updates the local list
+  - `EngineerSelector` dropdown now includes a `+ New engineer` option that switches to an inline name input; auto-selects the new engineer on save
 - Part 5: History page
   - `features/history/viewmodels/useHistoryViewModel.ts` — fetches resolved/dismissed bugs ordered by `resolved_at DESC`
   - `features/history/views/components/HistoryTable.tsx` — sortable table with severity/status badges, assignee, reporter, notes (truncated with full text on hover), resolved date
