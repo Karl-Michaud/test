@@ -110,7 +110,7 @@ export function BugDetailView({ bugId }: BugDetailViewProps) {
   const isActive = bug.status !== "resolved" && bug.status !== "dismissed";
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <div className="space-y-6">
       {/* Back */}
       <button
         onClick={() => router.back()}
