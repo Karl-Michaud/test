@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useBacklogViewModel } from "@/features/backlog/viewmodels/useBacklogViewModel";
 import { BacklogTable } from "@/features/backlog/views/components/BacklogTable";
 import { useEngineer } from "@/shared/context/EngineerContext";
 import { Bug, BugSeverity } from "@/features/backlog/models/types";
 
 export function BacklogView() {
+  const router = useRouter();
   const { bugs, loading, error, claimBug, unclaimBug, updateSeverity, dismissBug } = useBacklogViewModel();
   const { engineer } = useEngineer();
 
@@ -80,6 +82,7 @@ export function BacklogView() {
           bugs={bugs}
           onUpdateSeverity={(bugId: string, severity: BugSeverity) => updateSeverity(bugId, severity)}
           actionSlot={renderActions}
+          onRowClick={(bug) => router.push(`/bugs/${bug.id}`)}
         />
       )}
     </div>

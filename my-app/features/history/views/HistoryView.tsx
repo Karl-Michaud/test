@@ -1,9 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useHistoryViewModel } from "@/features/history/viewmodels/useHistoryViewModel";
 import { HistoryTable } from "@/features/history/views/components/HistoryTable";
 
 export function HistoryView() {
+  const router = useRouter();
   const { bugs, loading, error } = useHistoryViewModel();
 
   return (
@@ -28,7 +30,7 @@ export function HistoryView() {
           Loading history…
         </div>
       ) : (
-        <HistoryTable bugs={bugs} />
+        <HistoryTable bugs={bugs} onRowClick={(bug) => router.push(`/bugs/${bug.id}`)} />
       )}
     </div>
   );

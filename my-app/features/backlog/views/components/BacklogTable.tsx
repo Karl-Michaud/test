@@ -48,9 +48,10 @@ interface BacklogTableProps {
   bugs: Bug[];
   onUpdateSeverity?: (bugId: string, severity: BugSeverity) => void;
   actionSlot?: (bug: Bug) => React.ReactNode;
+  onRowClick?: (bug: Bug) => void;
 }
 
-export function BacklogTable({ bugs, onUpdateSeverity, actionSlot }: BacklogTableProps) {
+export function BacklogTable({ bugs, onUpdateSeverity, actionSlot, onRowClick }: BacklogTableProps) {
   const columns: ColumnDef<Bug, unknown>[] = [
     {
       accessorKey: "title",
@@ -127,7 +128,11 @@ export function BacklogTable({ bugs, onUpdateSeverity, actionSlot }: BacklogTabl
             id: "actions",
             header: "Actions",
             enableSorting: false,
-            cell: ({ row }: { row: { original: Bug } }) => actionSlot(row.original),
+            cell: ({ row }: { row: { original: Bug } }) => (
+              <div onClick={(e) => e.stopPropagation()}>
+                {actionSlot(row.original)}
+              </div>
+            ),
           } as ColumnDef<Bug, unknown>,
         ]
       : []),
@@ -139,6 +144,7 @@ export function BacklogTable({ bugs, onUpdateSeverity, actionSlot }: BacklogTabl
       data={bugs}
       getRowId={(row) => row.id}
       emptyMessage="No bugs in the backlog."
+      onRowClick={onRowClick}
     />
   );
 }

@@ -46,9 +46,10 @@ function formatDate(iso: string | null) {
 
 interface HistoryTableProps {
   bugs: Bug[];
+  onRowClick?: (bug: Bug) => void;
 }
 
-export function HistoryTable({ bugs }: HistoryTableProps) {
+export function HistoryTable({ bugs, onRowClick }: HistoryTableProps) {
   const columns: ColumnDef<Bug, unknown>[] = [
     {
       accessorKey: "title",
@@ -133,6 +134,7 @@ export function HistoryTable({ bugs }: HistoryTableProps) {
       data={bugs}
       getRowId={(row) => row.id}
       emptyMessage="No resolved or dismissed bugs yet."
+      onRowClick={onRowClick}
     />
   );
 }

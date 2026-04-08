@@ -25,6 +25,8 @@ interface DataTableProps<TData> {
   emptyMessage?: string;
   /** Extra className for the wrapping div */
   className?: string;
+  /** Called when a row is clicked */
+  onRowClick?: (row: TData) => void;
 }
 
 export function DataTable<TData>({
@@ -36,6 +38,7 @@ export function DataTable<TData>({
   getRowId,
   emptyMessage = "No results.",
   className = "",
+  onRowClick,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -100,7 +103,8 @@ export function DataTable<TData>({
               <tr
                 key={row.id}
                 data-selected={row.getIsSelected()}
-                className="bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
+                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                className={`bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800${onRowClick ? " cursor-pointer" : ""}`}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td key={cell.id} className="px-4 py-3">

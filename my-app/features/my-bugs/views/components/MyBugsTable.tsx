@@ -46,9 +46,10 @@ function formatDate(iso: string) {
 interface MyBugsTableProps {
   bugs: Bug[];
   onMarkResolved: (bugId: string) => void;
+  onRowClick?: (bug: Bug) => void;
 }
 
-export function MyBugsTable({ bugs, onMarkResolved }: MyBugsTableProps) {
+export function MyBugsTable({ bugs, onMarkResolved, onRowClick }: MyBugsTableProps) {
   const columns: ColumnDef<Bug, unknown>[] = [
     {
       accessorKey: "title",
@@ -107,12 +108,14 @@ export function MyBugsTable({ bugs, onMarkResolved }: MyBugsTableProps) {
       header: "Actions",
       enableSorting: false,
       cell: ({ row }) => (
-        <button
-          onClick={() => onMarkResolved(row.original.id)}
-          className="text-xs font-medium text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors"
-        >
-          Mark Resolved
-        </button>
+        <div onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={() => onMarkResolved(row.original.id)}
+            className="text-xs font-medium text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors"
+          >
+            Mark Resolved
+          </button>
+        </div>
       ),
     },
   ];
@@ -123,6 +126,7 @@ export function MyBugsTable({ bugs, onMarkResolved }: MyBugsTableProps) {
       data={bugs}
       getRowId={(row) => row.id}
       emptyMessage="No bugs assigned to you."
+      onRowClick={onRowClick}
     />
   );
 }

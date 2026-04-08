@@ -1,10 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useMyBugsViewModel } from "@/features/my-bugs/viewmodels/useMyBugsViewModel";
 import { MyBugsTable } from "@/features/my-bugs/views/components/MyBugsTable";
 import { useEngineer } from "@/shared/context/EngineerContext";
 
 export function MyBugsView() {
+  const router = useRouter();
   const { engineer } = useEngineer();
   const { bugs, loading, error, markResolved } = useMyBugsViewModel(engineer?.id ?? null);
 
@@ -43,7 +45,7 @@ export function MyBugsView() {
           Loading bugs…
         </div>
       ) : (
-        <MyBugsTable bugs={bugs} onMarkResolved={markResolved} />
+        <MyBugsTable bugs={bugs} onMarkResolved={markResolved} onRowClick={(bug) => router.push(`/bugs/${bug.id}`)} />
       )}
     </div>
   );
