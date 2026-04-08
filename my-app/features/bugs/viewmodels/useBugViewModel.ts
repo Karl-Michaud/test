@@ -66,9 +66,14 @@ export function useBugViewModel(bugId: string): UseBugViewModel {
     patch({ severity, status: "triaged" }),
   [patch]);
 
-  const dismissBug = useCallback(() =>
-    patch({ status: "dismissed", resolved_at: new Date().toISOString() }),
-  [patch]);
+  const dismissBug = useCallback(async () => {
+    const client = createClient();
+    const { error: deleteError } = await client
+      .from("bugs")
+      .delete()
+      .eq("id", bugId);
+    if (deleteError) setError(deleteError.message);
+  }, [bugId]);
 
   const resolveBug = useCallback(() =>
     patch({ status: "resolved", resolved_at: new Date().toISOString() }),

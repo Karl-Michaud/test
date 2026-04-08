@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useHistoryViewModel } from "@/features/history/viewmodels/useHistoryViewModel";
 import { HistoryTable } from "@/features/history/views/components/HistoryTable";
+import { SkeletonTable } from "@/shared/components/Skeleton";
 
 export function HistoryView() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export function HistoryView() {
           History
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {loading ? "Loading…" : `${bugs.length} resolved or dismissed bug${bugs.length !== 1 ? "s" : ""}`}
+          {loading ? "\u00a0" : `${bugs.length} resolved or dismissed bug${bugs.length !== 1 ? "s" : ""}`}
         </p>
       </div>
 
@@ -26,9 +27,7 @@ export function HistoryView() {
       )}
 
       {loading ? (
-        <div className="py-16 text-center text-sm text-zinc-400 dark:text-zinc-500">
-          Loading history…
-        </div>
+        <SkeletonTable rows={5} columns={7} />
       ) : (
         <HistoryTable bugs={bugs} onRowClick={(bug) => router.push(`/bugs/${bug.id}`)} />
       )}

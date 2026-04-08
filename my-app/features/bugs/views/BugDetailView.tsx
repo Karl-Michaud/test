@@ -4,6 +4,8 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useBugViewModel } from "@/features/bugs/viewmodels/useBugViewModel";
 import { useEngineer } from "@/shared/context/EngineerContext";
+import { useToast } from "@/shared/context/ToastContext";
+import { SkeletonLine, SkeletonCard } from "@/shared/components/Skeleton";
 import { BugSeverity, BugStatus } from "@/features/backlog/models/types";
 
 const SEVERITY_TITLE_COLOR: Record<BugSeverity, string> = {
@@ -65,6 +67,7 @@ interface BugDetailViewProps {
 export function BugDetailView({ bugId }: BugDetailViewProps) {
   const router = useRouter();
   const { engineer } = useEngineer();
+  const { addToast } = useToast();
   const { bug, loading, error, updateNotes, claimBug, unclaimBug, updateSeverity, dismissBug, resolveBug } = useBugViewModel(bugId);
 
   const [editingNotes, setEditingNotes] = useState(false);
@@ -86,8 +89,9 @@ export function BugDetailView({ bugId }: BugDetailViewProps) {
 
   if (loading) {
     return (
-      <div className="py-24 text-center text-sm text-zinc-400 dark:text-zinc-500">
-        Loading…
+      <div className="space-y-6">
+        <SkeletonLine width="w-16" height="h-4" />
+        <SkeletonCard />
       </div>
     );
   }
@@ -177,7 +181,7 @@ export function BugDetailView({ bugId }: BugDetailViewProps) {
         <div className="flex items-center gap-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
           {engineer && isUnassigned && (
             <button
-              onClick={() => claimBug(engineer)}
+              onClick={async () => { await claimBug(engineer); addToast("Bug claimed", "success"); }}
               className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
             >
               Claim
@@ -186,13 +190,13 @@ export function BugDetailView({ bugId }: BugDetailViewProps) {
           {engineer && isOwnedByMe && (
             <>
               <button
-                onClick={() => unclaimBug()}
+                onClick={async () => { await unclaimBug(); addToast("Bug unclaimed", "info"); }}
                 className="text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
               >
                 Unclaim
               </button>
               <button
-                onClick={() => resolveBug()}
+                onClick={async () => { await resolveBug(); addToast("Bug resolved — nice work!", "success"); }}
                 className="text-sm font-medium text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 transition-colors"
               >
                 Mark Resolved
@@ -200,7 +204,7 @@ export function BugDetailView({ bugId }: BugDetailViewProps) {
             </>
           )}
           <button
-            onClick={() => dismissBug()}
+            onClick={async () => { await dismissBug(); addToast("Bug dismissed", "info"); router.push("/backlog"); }}
             className="text-sm text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 transition-colors"
           >
             Dismiss

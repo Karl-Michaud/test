@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useBacklogViewModel } from "@/features/backlog/viewmodels/useBacklogViewModel";
 import { BacklogTable } from "@/features/backlog/views/components/BacklogTable";
 import { useEngineer } from "@/shared/context/EngineerContext";
+import { useToast } from "@/shared/context/ToastContext";
+import { SkeletonTable } from "@/shared/components/Skeleton";
 import { Bug, BugSeverity } from "@/features/backlog/models/types";
 import { ReportBugModal } from "@/features/bugs/views/components/ReportBugModal";
 
@@ -12,6 +14,7 @@ export function BacklogView() {
   const router = useRouter();
   const { bugs, loading, error, refresh, claimBug, unclaimBug, updateSeverity, triageBug, dismissBug } = useBacklogViewModel();
   const { engineer } = useEngineer();
+  const { addToast } = useToast();
   const [reportingOpen, setReportingOpen] = useState(false);
 
   function renderActions(bug: Bug) {
@@ -25,13 +28,22 @@ export function BacklogView() {
       { value: "dismiss", label: "Dismiss" },
     ];
 
-    function handleAction(e: React.ChangeEvent<HTMLSelectElement>) {
+    async function handleAction(e: React.ChangeEvent<HTMLSelectElement>) {
       const action = e.target.value;
       e.target.value = "";
-      if (action === "triage") triageBug(bug.id);
-      else if (action === "claim" && engineer) claimBug(bug.id, engineer);
-      else if (action === "unclaim") unclaimBug(bug.id);
-      else if (action === "dismiss") dismissBug(bug.id);
+      if (action === "triage") {
+        await triageBug(bug.id);
+        addToast("Bug triaged", "info");
+      } else if (action === "claim" && engineer) {
+        await claimBug(bug.id, engineer);
+        addToast("Bug claimed", "success");
+      } else if (action === "unclaim") {
+        await unclaimBug(bug.id);
+        addToast("Bug unclaimed", "info");
+      } else if (action === "dismiss") {
+        await dismissBug(bug.id);
+        addToast("Bug dismissed", "info");
+      }
     }
 
     return (
@@ -58,12 +70,12 @@ export function BacklogView() {
             Bug Backlog
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
-            {loading ? "Loading…" : `${bugs.length} active bug${bugs.length !== 1 ? "s" : ""}`}
+            {loading ? "\u00a0" : `${bugs.length} active bug${bugs.length !== 1 ? "s" : ""}`}
           </p>
         </div>
         <button
           onClick={() => setReportingOpen(true)}
-          className="text-sm font-medium px-3 py-1.5 rounded-md border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+          className="text-sm font-medium px-3 py-1.5 rounded-md bg-red-600 hover:bg-red-700 text-white shadow-sm transition-colors"
         >
           Report Bug
         </button>
@@ -89,9 +101,7 @@ export function BacklogView() {
       )}
 
       {loading ? (
-        <div className="py-16 text-center text-sm text-zinc-400 dark:text-zinc-500">
-          Loading bugs…
-        </div>
+        <SkeletonTable rows={6} columns={7} />
       ) : (
         <BacklogTable
           bugs={bugs}

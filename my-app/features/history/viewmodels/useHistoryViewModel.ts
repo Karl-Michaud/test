@@ -23,7 +23,7 @@ export function useHistoryViewModel(): UseHistoryViewModel {
     const { data, error: fetchError } = await client
       .from("bugs")
       .select("*")
-      .in("status", ["resolved", "dismissed"])
+      .eq("status", "resolved")
       .order("resolved_at", { ascending: false });
 
     if (fetchError) {

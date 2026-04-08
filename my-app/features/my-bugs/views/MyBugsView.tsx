@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMyBugsViewModel } from "@/features/my-bugs/viewmodels/useMyBugsViewModel";
 import { MyBugsTable } from "@/features/my-bugs/views/components/MyBugsTable";
 import { useEngineer } from "@/shared/context/EngineerContext";
+import { SkeletonTable } from "@/shared/components/Skeleton";
 
 export function MyBugsView() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export function MyBugsView() {
         </h1>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {loading
-            ? "Loading…"
+            ? "\u00a0"
             : `${bugs.length} bug${bugs.length !== 1 ? "s" : ""} assigned to ${engineer.name}`}
         </p>
       </div>
@@ -41,9 +42,7 @@ export function MyBugsView() {
       )}
 
       {loading ? (
-        <div className="py-16 text-center text-sm text-zinc-400 dark:text-zinc-500">
-          Loading bugs…
-        </div>
+        <SkeletonTable rows={5} columns={6} />
       ) : (
         <MyBugsTable bugs={bugs} onMarkResolved={markResolved} onRowClick={(bug) => router.push(`/bugs/${bug.id}`)} />
       )}

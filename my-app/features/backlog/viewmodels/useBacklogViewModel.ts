@@ -147,13 +147,13 @@ export function useBacklogViewModel(): UseBacklogViewModel {
     setBugs(updated);
 
     const client = createClient();
-    const { error: updateError } = await client
+    const { error: deleteError } = await client
       .from("bugs")
-      .update({ status: "dismissed", resolved_at: new Date().toISOString() })
+      .delete()
       .eq("id", bugId);
 
-    if (updateError) {
-      setError(updateError.message);
+    if (deleteError) {
+      setError(deleteError.message);
       fetchBugs();
     }
   }, [fetchBugs]);

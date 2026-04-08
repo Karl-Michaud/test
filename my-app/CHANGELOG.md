@@ -3,6 +3,22 @@
 ## [Unreleased]
 
 ### Added
+- Toast notification system (`ToastContext`) — success/info/error toasts auto-dismiss after 3.5s; wired to claim, unclaim, triage, resolve, and dismiss actions
+- Skeleton loaders (`Skeleton.tsx`) — shimmer table and card skeletons replace plain "Loading…" text across all views
+
+### Changed
+- Fixed font: removed `font-family: Arial` body override so Geist Sans renders correctly
+- Page content fades and slides in on navigation via CSS keyframe on `<main>`
+- Modal (Report Bug) animates in — backdrop fades, panel slides up
+- Navbar height increased to 56px; brand uses monospace font with red dot indicator; active nav link shows underline
+- "Report Bug" button changed from ghost/bordered to filled red CTA
+- Dismissed bugs are now hard-deleted from Supabase instead of setting `status: dismissed`
+- History view now only shows resolved bugs; dismissed bugs no longer appear there
+- Dismissing from the bug detail page redirects to `/backlog`
+
+---
+
+### Added
 - Engineer creation from selector
   - `EngineerContext` exposes `createEngineer(name)` — inserts into Supabase and updates the local list
   - `EngineerSelector` dropdown now includes a `+ New engineer` option that switches to an inline name input; auto-selects the new engineer on save
