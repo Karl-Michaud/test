@@ -1,0 +1,43 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { createClient } from "@/shared/supabase/client";
+import { Bug } from "@/features/backlog/models/types";
+
+interface UseHistoryViewModel {
+  bugs: Bug[];
+  loading: boolean;
+  error: string | null;
+}
+
+export function useHistoryViewModel(): UseHistoryViewModel {
+  const [bugs, setBugs] = useState<Bug[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchBugs = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    const client = createClient();
+    const { data, error: fetchError } = await client
+      .from("bugs")
+      .select("*")
+      .in("status", ["resolved", "dismissed"])
+      .order("resolved_at", { ascending: false });
+
+    if (fetchError) {
+      setError(fetchError.message);
+    } else {
+      setBugs(data ?? []);
+    }
+
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    fetchBugs();
+  }, [fetchBugs]);
+
+  return { bugs, loading, error };
+}

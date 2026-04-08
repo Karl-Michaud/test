@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Added
+- Part 5: History page
+  - `features/history/viewmodels/useHistoryViewModel.ts` — fetches resolved/dismissed bugs ordered by `resolved_at DESC`
+  - `features/history/views/components/HistoryTable.tsx` — sortable table with severity/status badges, assignee, reporter, notes (truncated with full text on hover), resolved date
+  - `features/history/views/HistoryView.tsx` — view with loading/error states
+  - `app/history/page.tsx` — route at `/history`
 - Part 4: Triage
   - `shared/components/SeveritySelect.tsx` — inline severity dropdown styled after reference StageSelect
   - `useBacklogViewModel` extended with `updateSeverity` (sets severity + marks bug as `triaged`) and `dismissBug` (sets `dismissed`, records `resolved_at`)
